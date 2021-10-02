@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <title>Bike Price Predictor</title>
+</head>
+
+<body class="bg-dark">
+    <div class="container" id='blur'>
+        <div class="row">
+            <div class="card mt-50" style="width: 100%; height: 100% ">
+                <div class="card-header">
+                    <div class="col-12" style="text-align: center;">
+                        <h1>Bike Price Predictor</h1>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="#" accept-charset="utf-8">
+                        <div class="col-10 form-group" style="text-align: center;">
+                            <label><b>Select the Brand</b></label>
+                            <select class="selectpicker form-control" name="brand" id="brand" required="1"
+                                onchange='load_bike_models(this.id,"bikename")'>
+                                {% for i in brands %}
+                                <option value="{{ i }}">{{ i }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-10 form-group" style="text-align: center;">
+                            <label><b>Select the bike model</b></label>
+                            <select class="selectpicker form-control" name="bikename" id="bikename" required="1">
+                            </select>
+                        </div>
+
+                        <div class="col-10 form-group" style="text-align: center;">
+                            <label><b>Select the age</b></label>
+                            <select class="selectpicker form-control" name="age" id="age" required="1">
+                                {% for i in ages %}
+                                <option value="{{ i }}">{{ i }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-10 form-group" style="text-align: center;">
+                            <label><b>Select the power</b></label>
+                            <select class="selectpicker form-control" name="power" id="power" required="1">
+                                {% for i in powers %}
+                                <option value="{{ i }}">{{ i }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-10 form-group" style="text-align: center;">
+                            <label><b>Select the owner type</b></label>
+                            <select class="selectpicker form-control" name="owner" id="owner" required="1">
+                                {% for i in owners %}
+                                <option value="{{ i }}">{{ i }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-10 form-group" style="text-align: center;">
+                            <label><b>Enter the number of kilometers driven</b></label>
+                            <input class="form-control" type="text" id="kms_driven" name="kms_driven"
+                                placeholder="Enter the no. of kilometres driven ">
+                        </div>
+                        <div class="col-10 form-group" style="text-align: center;">
+                            <!-- <button class="btn btn-primary form-control" onclick="send_data(),toggle()">Predict Price</button> -->
+                            <a href="#" class="btn btn-primary form-control" onclick="send_data()">Predict Price</a>
+                        </div>
+                    </form>
+                    <br>
+                    <div class="popup">
+                        <div class="col-12" style="text-align: center;">
+                            <h3><span id="prediction"></span></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function load_bike_models(brand_id, bike_model_id) {
+            var company = document.getElementById(brand_id);
+            var model = document.getElementById(bike_model_id);
+            console.log(company.value);
+            model.value = "";
+            model.innerHTML = "";
+            {% for i in brands %}
+            if (company.value == "{{ i }}") {
+                {% for j in bikenames %}
+                {% if i in j %}
+                var newoption = document.createElement("option");
+                newoption.value = "{{ j }}";
+                newoption.innerHTML = "{{ j }}";
+                model.options.add(newoption);
+                {% endif %}
+                {% endfor %}
+            }
+            {% endfor %}
+        }
+
+        function form_handler(event) {
+            event.preventDefault();
+        }
+
+        function send_data() {
+            document.querySelector('form').addEventListener('submit', form_handler);
+            var fd = new FormData(document.querySelector('form'));
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('POST', '/predict', true);
+            document.getElementById("prediction").innerHTML = "Wait! Predicting Price...";
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    document.getElementById("prediction").innerHTML = "Prediction: Rs." + xhr.responseText;
+                }
+            }
+
+            xhr.send(fd);
+        }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
